@@ -28,17 +28,6 @@ CREATE TABLE IF NOT EXISTS DBName.Users (
     sessionId VARCHAR(255) NULL
 );
 
-drop table DBName.Clients;
-CREATE TABLE IF NOT EXISTS DBName.Clients (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(255) NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    lastName VARCHAR(255) NOT NULL,
-    phone VARCHAR(30) NOT NULL,
-    updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
 drop table DBName.Conversations;
 CREATE TABLE IF NOT EXISTS DBName.Conversations (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -70,5 +59,4 @@ CREATE TABLE IF NOT EXISTS DBName.Reports (
 ```  
 
 Diagrama Entidad-Relacion  
-
-![DiagramaER](https://referencias-documentacion-md.s3.us-west-2.amazonaws.com/DiagramaER.jpg)  
+ 
