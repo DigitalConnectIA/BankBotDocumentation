@@ -549,7 +549,7 @@ El dato importante de entrada para esta lambda es el ID de conexión este viene 
 Esta lambda es la encargada de procesar los datos de un socket cuando ya está conectado. El JSON que se debe enviar a la ruta `mensaje` es el siguiente
 
 ```json
-{"action": "mensaje", "datos":"hola"}
+{"action":"mensaje","message":"hola"}
 ```
 
 La lambda recibe los siquientes datos ```event['requestContext']['connectionId']``` es el ID con el que se identifica la conexión ```event['body'])['datos']``` es el mensaje que va hacia la State Machine, la cual esta referenciada en la siguiente variable de entorno ```STATE_MACHINE = "ARN de la state machine chatbot"```. Para invocar la State Machine se utiliza el siguiente código
