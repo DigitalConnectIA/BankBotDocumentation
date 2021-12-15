@@ -27,3 +27,5 @@ Debe regresar un json y se tiene que copiar el URI y pegar en `buildspec.yaml` e
 El siguiente paso es generar un Pipeline en `CodePipeline`, en donde el origen es `GitHub` en su version 2 y build debe ser `CodeBuild`.  
 El proyecto de CodeBuild debe estar en entorno `Linux`, imagen `aws/codebuild/standard:5.0`, Privilegiado debe ser `Verdadero` y CloudWatch Logs `Habilitado`  
 Al terminar el proceso de creacion del pipeline, creara un Bucket S3 se debe copiar el nombre y agregar en el carchivo `buildspec.yaml` en la linea de `-sam deploy --s3-bucket <nuevo bucket>`  
+
+TODO agregar comandos directamente sin el sh

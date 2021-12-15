@@ -6,14 +6,10 @@ Estas API's son usadas en el Front-End de Amplify, cada una será especificada y
 ## PointAccess
 Esta API es la central, su configuración en el Template SAM ya incluye la activación de cors y el método de respuesta de cada una de las siguientes rutas.
 * /clients
-* /conversation
 * /convertest
 * /engine
-* /import
 * /metrics
 * /reports
-* /SemanticDistanceTrainer
-* /SnipsTrainer
 * /start
 * /token
 * /user
@@ -90,74 +86,6 @@ Definicion de delete para clientes
 }
 ```
 
-### /conversations
-La integración de esta ruta está compuesta por la lambda `ConversationService`. La configuracion de esta lambda solo requiere de las siguientes variables de entorno:
-```
-cluster_arn_aurora = "ARN del cluster"
-secret_arn_aurora = "aquí Jose Luis"
-```
-La peticion a esta ruta es por el método `POST` y puede recibir cualquiera de los siguientes JSON.  
-Definicion de creacion de una conversacion, ```idClient``` -> referencia al ID de cliente
-```json
-{
-    "operation": "create",
-    "payload": {
-        "Item": {
-          "transcription": {
-            "messageIn": "data",
-            ...
-          },
-          "states": {},
-          "idClient": null, 
-          "intent": null,
-          "lastState": null,
-          "lasQuestion": null,
-        }
-    }
-}
-```
-Definicion de getItem para la conversacion
-```json
-{
-    "operation": "getItem",
-    "payload": {
-        "Item": {
-            "sessionId": "cb00463f-7166-11eb-9998-c727838c173"
-        }
-    }
-}
-```
-Definicion de update para la conversacion, ```sessionId``` -> requerido, ```idClient``` -> referencia al ID del cliente
-```json
-{
-    "operation": "update",
-    "payload": {
-        "Item": {
-          "sessionId": "cb00463f-7166-11eb-9998-c727838c1732",
-          "transcription": {
-            "messageIn": "data",
-            ...
-          },
-          "states": {},
-          "idClient": null,
-          "intent": null,
-          "lastState": null,
-          "lasQuestion": null,
-        }
-    }
-}
-```
-Definicion de delete para la conversación
-```json
-{
-    "operation": "delete",
-    "payload": {
-        "Item": {
-            "sessionId": "cb00463f-7166-11eb-9998-c727838c173"
-        }
-    }
-}
-```
 
 ### /convertest
 Tienen una integración con la lambda `ConversationTests`, consiste en almacenar en una base de datos los mensajes de prueba junto a la evaluación que le da el agente. Contiene una sola variable de entorno que es:
@@ -194,15 +122,6 @@ La ruta recibe la informacion en metodo `GET` y formato ```text/xml```
 }
 ```
 
-### /import
-La integración de esta ruta es la lambda `Lex`, esta genera un bot Lex mediante la extracción de un zip en s3 el cual debió importarse previamente en la ruta ```/{folder}/{item}```.
-Su peticion es con el método `POST` y en el body se inserta el nombre del bucket y el archivo que contiene los datos del nuevo bot
-```json
-{
-  "bucket":"datoslex",
-  "zip":"grupovanguardiaLex.zip"
-}
-```
 
 ### /metrics
 Esta ruta devuelve las metricas para mostrar al front y sus json son los siguientes
@@ -327,32 +246,8 @@ Definicion para eliminar el reporte. reportId requerido
 }
 ```
 
-### /SemanticDistanceTrainer
-Son peticiones mediante post con los siguientes json disponibles:
-```json
-{
-    "operation": "get",
-    "payload": {}
-}
-```
-El siguiente json agrega lexemas a una intent:
-```json
-{
-    "operation": "add",
-    "payload": {
-        "intent": "ventas",
-        "lexemas": "trabajo vacante empleo"
-    }
-}
-```
 
-### /SnipsTrainer
-El siguiente json selecciona el nombre del motor snips que desea reentrenar:
-```json
-{
-    "bot": "grupovanguardia"
-}
-```
+
 
 ### /start
 La lambda en la integración de esta ruta se llama `TwilioStart` esta no recibe variable y solo ejecuta la respuesta rapida para iniciar una conversación de voz. Pero si requiere de la layer `LayerTwilio` y de la siguiente variable de entorno
@@ -541,39 +436,3 @@ La integración de esta ruta es con el servicio de `s3` y se encarga de realizar
 
 ## socket_chatbot
 Esta API consta de tres rutas `$connect`, `$disconnect` y `mensaje`. Cada una cuenta con su respectiva lambda con los siguientes nombres `SocketConnect`, `SocketDisconnect` y `SocketMensaje`
-
-### SocketConnect
-El dato importante de entrada para esta lambda es el ID de conexión este viene dentro de la siguiente variable ```event['requestContext']['connectionId']```. Este dato debe ser enviado a la base de datos para identificar una nueva conexión y por lo tanto una nueva conversación, así que como configuración de la lambda tiene la siguiente variable de entorno ```ConversationService = ARN de la lambda ConversationService```
-
-### SocketMensaje
-Esta lambda es la encargada de procesar los datos de un socket cuando ya está conectado. El JSON que se debe enviar a la ruta `mensaje` es el siguiente
-
-```json
-{"action":"mensaje","message":"hola"}
-```
-
-La lambda recibe los siquientes datos ```event['requestContext']['connectionId']``` es el ID con el que se identifica la conexión ```event['body'])['datos']``` es el mensaje que va hacia la State Machine, la cual esta referenciada en la siguiente variable de entorno ```STATE_MACHINE = "ARN de la state machine chatbot"```. Para invocar la State Machine se utiliza el siguiente código
-
-```python
-import boto3, os
-sf = boto3.client('stepfunctions')
-sf_data = "{\"sessionID\":\""+event['requestContext']['connectionId']+"\",\"mensaje\":\""+json.loads(event['body'])['datos']+"\"}"
-sf_respuesta = sf.start_sync_execution(
-  stateMachineArn=os.environ['STATE_MACHINE'],
-  input=str(sf_data))
-sf_data_output=json.loads(sf_respuesta['output'])
-print("Result SF ",sf_data_output)
-```
-Como los socket no tienen `return` para poder regresar la respuesta de la State Machine se genera el siguiente codigo
-```python
-import boto3, os
-api_gateway = boto3.client('apigatewaymanagementapi',endpoint_url = "https://" + event["requestContext"]["domainName"] + "/" + event["requestContext"]["stage"])
-api_gateway.post_to_connection(
-  Data=sf_respuesta['output'],
-  ConnectionId=event['requestContext']['connectionId']
-)
-```
-De esta forma aseguramos regresar el mensaje al mismo socket que hizo la petición
-
-### SocketDisconnect
-Esta lambda responde a la ruta `$disconnect`, por el momento no se tiene ninguna funcionalidad solo genera la desconexion segura de un socket (lambda vacía)
