@@ -327,4 +327,3 @@ Esta lambda es la encarga de consultar que agente esta disponible para atender e
 Se encarga de modificar el status del agente dentro de la tabla Users, para notificar que no está conectado
 ### SocketMensajeAgent
 Aquí se reciben los mensajes por parte del agente. En caso de tener asigando un usuario, redirige los mensajes a el, en caso contrario solo notifica que no tiene usuario asignado
-```
