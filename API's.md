@@ -299,6 +299,7 @@ Es indispensable que no falte ningun campo a pesar de de ir vacio. Para re entre
 }
 ```
 Para que el entrenamiento sea correcto se debe respetar la sintaxis de payload y de las entity dentro de los examples y slots
+
 ## Socket_user
 Esta API consta de tres rutas `$connect`, `$disconnect` y `mensaje`. Cada una cuenta con su respectiva lambda con los siguientes nombres `SocketConnectUser`, `SocketDisconnectUser` y `SocketMensajeUser`
 ### SocketConnectUser
@@ -319,6 +320,7 @@ sf_respuesta = sf.start_sync_execution(stateMachineArn=os.environ['STATE_MACHINE
 mensajeBot=json.loads(sf_respuesta['output'])
 if json.loads(sf_respuesta['output'])['intent'] == 'agentehabla':
 ```
+
 ## socket_agente
 Esta API consta de tres rutas `$connect`, `$disconnect` y `mensaje`. Cada una cuenta con su respectiva lambda con los siguientes nombres `SocketConnectAgent`, `SocketDisconnectAgent` y `SocketMensajeAgent`
 ### SocketConnectAgent
