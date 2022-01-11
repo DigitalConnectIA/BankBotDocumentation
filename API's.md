@@ -10,6 +10,7 @@ Esta API es la central, su configuración en el Template SAM ya incluye la activ
 * /user
 * /{folder}/{item}
 * /trainer
+* /lexemas
 
 ### /reports
 La integración que tiene esta ruta es con la lambda `ReportsService`. La configuracion de esta lambda solo requiere de las siguientes variables de entorno:
@@ -298,7 +299,23 @@ Es indispensable que no falte ningun campo a pesar de de ir vacio. Para re entre
     }
 }
 ```
-Para que el entrenamiento sea correcto se debe respetar la sintaxis de payload y de las entity dentro de los examples y slots
+Para que el entrenamiento sea correcto se debe respetar la sintaxis de payload y de las entity dentro de los examples y slots.  
+
+### /lexemas
+Esta es la api que recibe como parametro un payload en formato de cadena de texto para posteriormente convertirlo en un vector con un peso en especifico.  
+```json
+{
+    "operation": "lexemas",
+    "payload": "frase que contiene las palabras importantes"
+}
+```
+Como salida a este ejemplo, seria:  
+```json
+{
+  "statusCode": 200,
+  "body": [ ["fras", 1], ["contien", 1], ["palabr", 1], ["import", 1] ]
+}
+```
 
 ## Socket_user
 Esta API consta de tres rutas `$connect`, `$disconnect` y `mensaje`. Cada una cuenta con su respectiva lambda con los siguientes nombres `SocketConnectUser`, `SocketDisconnectUser` y `SocketMensajeUser`
