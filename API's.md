@@ -341,8 +341,17 @@ if json.loads(sf_respuesta['output'])['intent'] == 'agentehabla':
 ## socket_agente
 Esta API consta de tres rutas `$connect`, `$disconnect` y `mensaje`. Cada una cuenta con su respectiva lambda con los siguientes nombres `SocketConnectAgent`, `SocketDisconnectAgent` y `SocketMensajeAgent`
 ### SocketConnectAgent
-Esta lambda es la encarga de consultar que agente esta disponible para atender el chat, lo hace mediante consultas a la tabla Users
+Esta lambda es la encarga de consultar el agente que se logeo y asignarle su sessionId.  
+Para poder conectarse debe ser envíado en el header el id del agente para asignarle el sessionId. Se deja el ejemplo con wscat
+```bash
+wscat -c wss://9eobhn0jah.execute-api.us-west-2.amazonaws.com/dev --header idAgent:2
+```
 ### SocketDisconnectAgent
 Se encarga de modificar el status del agente dentro de la tabla Users, para notificar que no está conectado
 ### SocketMensajeAgent
-Aquí se reciben los mensajes por parte del agente. En caso de tener asigando un usuario, redirige los mensajes a el, en caso contrario solo notifica que no tiene usuario asignado
+Aquí se reciben los mensajes por parte del agente. En caso de tener asigando un usuario, redirige los mensajes a el, en caso contrario solo notifica que no tiene usuario asignado. El json que debe recibir es el siguiente, el key `sessionUsers` solo se usa para notificar que se requiere conectar a ese Usuario
+```json
+{
+    "action":"mensaje", "message":"hola", "sessionUsers":"MuWSSdEVvHcCJaQ="
+}
+```
